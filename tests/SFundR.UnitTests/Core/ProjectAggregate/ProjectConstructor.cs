@@ -5,12 +5,13 @@ namespace SFundR.UnitTests.Core.ProjectAggregate;
 
 public class ProjectConstructor
 {
-  private string _testName = "test name";
+  private const string TestName = "test name";
+  private const string TestDescription = "test description";
   private Project? _testProject;
 
   private Project CreateProject()
   {
-    return new Project(_testName);
+    return new Project(TestName, TestDescription);
   }
 
   [Fact]
@@ -18,7 +19,7 @@ public class ProjectConstructor
   {
     _testProject = CreateProject();
 
-    Assert.Equal(_testName, _testProject.Name);
+    Assert.Equal(TestName, _testProject.Name);
   }
 
   [Fact]
@@ -27,13 +28,5 @@ public class ProjectConstructor
     _testProject = CreateProject();
 
     Assert.NotNull(_testProject.Items);
-  }
-
-  [Fact]
-  public void InitializesStatusToInProgress()
-  {
-    _testProject = CreateProject();
-
-    Assert.Equal(ProjectStatus.Complete, _testProject.Status);
   }
 }

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace SFundR.Core.Interfaces;
+﻿namespace SFundR.Core.Interfaces;
 
 public interface IEmailSender
 {

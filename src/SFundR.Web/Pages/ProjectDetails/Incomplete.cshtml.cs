@@ -1,34 +1,32 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using SFundR.Core.ProjectAggregate;
 using SFundR.Core.ProjectAggregate.Specifications;
 using SFundR.SharedKernel.Interfaces;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SFundR.Web.Pages.ToDoRazorPage;
+namespace SFundR.Web.Pages.ProjectDetails;
 
-public class IncompleteModel : PageModel
+public class UnapprovedModel : PageModel
 {
-  private readonly IRepository<Project> _repository;
+  private readonly IRepository<Project> _projectRepository;
 
-  public List<ToDoItem>? ToDoItems { get; set; }
-
-  public IncompleteModel(IRepository<Project> repository)
+  public UnapprovedModel(IRepository<Project> projectRepository)
   {
-    _repository = repository;
+    _projectRepository = projectRepository;
   }
+
+  public List<TimeItem>? TimeItems { get; set; }
 
   public async Task OnGetAsync()
   {
     var projectSpec = new ProjectByIdWithItemsSpec(1); // TODO: get from route
-    var project = await _repository.GetBySpecAsync(projectSpec);
+    var project = await _projectRepository.GetBySpecAsync(projectSpec);
     if (project == null)
     {
       return;
     }
-    var spec = new IncompleteItemsSpec();
 
-    ToDoItems = spec.Evaluate(project.Items).ToList();
+    var spec = new UnapprovedItemsSpec();
+
+    TimeItems = spec.Evaluate(project.Items).ToList();
   }
 }

@@ -1,15 +1,13 @@
 ﻿using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Mvc;
 using SFundR.Core.ProjectAggregate;
 using SFundR.Core.ProjectAggregate.Specifications;
 using SFundR.SharedKernel.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace SFundR.Web.Endpoints.ProjectEndpoints;
 
-public class GetById : BaseAsyncEndpoint
-    .WithRequest<GetProjectByIdRequest>
-    .WithResponse<GetProjectByIdResponse>
+public class GetById : BaseAsyncEndpoint.WithRequest<GetProjectByIdRequest>.WithResponse<GetProjectByIdResponse>
 {
   private readonly IRepository<Project> _repository;
 
@@ -20,23 +18,28 @@ public class GetById : BaseAsyncEndpoint
 
   [HttpGet(GetProjectByIdRequest.Route)]
   [SwaggerOperation(
-      Summary = "Gets a single Project",
-      Description = "Gets a single Project by Id",
-      OperationId = "Projects.GetById",
-      Tags = new[] { "ProjectEndpoints" })
+    Summary = "Gets a single Project",
+    Description = "Gets a single Project by Id",
+    OperationId = "Projects.GetById",
+    Tags = new[] {"ProjectEndpoints"})
   ]
-  public override async Task<ActionResult<GetProjectByIdResponse>> HandleAsync([FromRoute] GetProjectByIdRequest request,
-      CancellationToken cancellationToken)
+  public override async Task<ActionResult<GetProjectByIdResponse>> HandleAsync(
+    [FromRoute] GetProjectByIdRequest request,
+    CancellationToken cancellationToken = new())
   {
     var spec = new ProjectByIdWithItemsSpec(request.ProjectId);
-    var entity = await _repository.GetBySpecAsync(spec); // TODO: pass cancellation token
-    if (entity == null) return NotFound();
+    var entity = await _repository.GetBySpecAsync(spec, cancellationToken); // TODO: pass cancellation token
+    if (entity == null)
+    {
+      return NotFound();
+    }
 
     var response = new GetProjectByIdResponse
     (
-        id: entity.Id,
-        name: entity.Name,
-        items: entity.Items.Select(item => new ToDoItemRecord(item.Id, item.Title, item.Description, item.IsDone)).ToList()
+      entity.Id,
+      entity.Name,
+      entity.Items.Select(item =>
+        new TimeItemRecord(item.Id, item.Comment, item.Date, item.IsApproved, item.ApprovedDateTime)).ToList()
     );
     return Ok(response);
   }

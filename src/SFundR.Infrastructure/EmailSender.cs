@@ -1,6 +1,6 @@
 ﻿using System.Net.Mail;
-using SFundR.Core.Interfaces;
 using Microsoft.Extensions.Logging;
+using SFundR.Core.Interfaces;
 
 namespace SFundR.Infrastructure;
 
@@ -16,15 +16,7 @@ public class EmailSender : IEmailSender
   public async Task SendEmailAsync(string to, string from, string subject, string body)
   {
     var emailClient = new SmtpClient("localhost");
-    var message = new MailMessage
-    {
-
-      From = new MailAddress(from),
-      Subject = subject,
-      Body = body
-
-
-    };
+    var message = new MailMessage {From = new MailAddress(from), Subject = subject, Body = body};
     message.To.Add(new MailAddress(to));
     await emailClient.SendMailAsync(message);
     _logger.LogWarning($"Sending email to {to} from {from} with subject {subject}.");

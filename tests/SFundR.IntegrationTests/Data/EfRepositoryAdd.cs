@@ -8,14 +8,15 @@ public class EfRepositoryAdd : BaseEfRepoTestFixture
   [Fact]
   public async Task AddsProjectAndSetsId()
   {
-    var testProjectName = "testProject";
+    const string testProjectName = "testProject";
+    const string testProjectDescription = "testProjectDescription";
     var repository = GetRepository();
-    var project = new Project(testProjectName);
+    var project = new Project(testProjectName, testProjectDescription);
 
     await repository.AddAsync(project);
 
     var newProject = (await repository.ListAsync())
-                    .FirstOrDefault();
+      .FirstOrDefault();
 
     Assert.Equal(testProjectName, newProject?.Name);
     Assert.True(newProject?.Id > 0);

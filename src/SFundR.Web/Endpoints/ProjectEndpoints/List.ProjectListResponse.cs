@@ -1,5 +1,4 @@
-﻿
-namespace SFundR.Web.Endpoints.ProjectEndpoints;
+﻿namespace SFundR.Web.Endpoints.ProjectEndpoints;
 
 public class ProjectListResponse
 {

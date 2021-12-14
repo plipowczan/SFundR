@@ -1,56 +1,54 @@
-﻿using SFundR.Core.ProjectAggregate;
+﻿using Microsoft.EntityFrameworkCore;
+using SFundR.Core.ProjectAggregate;
 using SFundR.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace SFundR.Web;
 
 public static class SeedData
 {
-  public static readonly Project TestProject1 = new Project("Test Project");
-  public static readonly ToDoItem ToDoItem1 = new ToDoItem
+  public static readonly Project TestProject1 = new("Test Project", "Test Project Description");
+
+  public static readonly TimeItem TimeItem1 = new()
   {
-    Title = "Get Sample Working",
-    Description = "Try to get the sample to build."
+    Comment = "Get Sample Working", Date = DateTime.Now.AddDays(-1), WorkTimeHours = 1
   };
-  public static readonly ToDoItem ToDoItem2 = new ToDoItem
+
+  public static readonly TimeItem TimeItem2 = new()
   {
-    Title = "Review Solution",
-    Description = "Review the different projects in the solution and how they relate to one another."
+    Comment = "Review Solution", Date = DateTime.Now.AddDays(-2), WorkTimeHours = 1.5M
   };
-  public static readonly ToDoItem ToDoItem3 = new ToDoItem
+
+  public static readonly TimeItem TimeItem3 = new()
   {
-    Title = "Run and Review Tests",
-    Description = "Make sure all the tests run and review what they are doing."
+    Comment = "Run and Review Tests", Date = DateTime.Now.AddDays(-3), WorkTimeHours = 2
   };
 
   public static void Initialize(IServiceProvider serviceProvider)
   {
-    using (var dbContext = new AppDbContext(
-        serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>(), null))
+    using var dbContext = new AppDbContext(
+      serviceProvider.GetRequiredService<DbContextOptions<AppDbContext>>(), null);
+    // Look for any time items.
+    if (dbContext.Times.Any())
     {
-      // Look for any TODO items.
-      if (dbContext.ToDoItems.Any())
-      {
-        return;   // DB has been seeded
-      }
-
-      PopulateTestData(dbContext);
-
-
+      return; // DB has been seeded
     }
+
+    PopulateTestData(dbContext);
   }
+
   public static void PopulateTestData(AppDbContext dbContext)
   {
-    foreach (var item in dbContext.ToDoItems)
+    foreach (var item in dbContext.Times)
     {
       dbContext.Remove(item);
     }
+
     dbContext.SaveChanges();
 
     TestProject1.Id = 1;
-    TestProject1.AddItem(ToDoItem1);
-    TestProject1.AddItem(ToDoItem2);
-    TestProject1.AddItem(ToDoItem3);
+    TestProject1.AddItem(TimeItem1);
+    TestProject1.AddItem(TimeItem2);
+    TestProject1.AddItem(TimeItem3);
     dbContext.Projects.Add(TestProject1);
 
     dbContext.SaveChanges();

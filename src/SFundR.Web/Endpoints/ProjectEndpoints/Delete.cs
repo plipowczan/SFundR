@@ -1,14 +1,12 @@
 ﻿using Ardalis.ApiEndpoints;
+using Microsoft.AspNetCore.Mvc;
 using SFundR.Core.ProjectAggregate;
 using SFundR.SharedKernel.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace SFundR.Web.Endpoints.ProjectEndpoints;
 
-public class Delete : BaseAsyncEndpoint
-    .WithRequest<DeleteProjectRequest>
-    .WithoutResponse
+public class Delete : BaseAsyncEndpoint.WithRequest<DeleteProjectRequest>.WithoutResponse
 {
   private readonly IRepository<Project> _repository;
 
@@ -19,16 +17,19 @@ public class Delete : BaseAsyncEndpoint
 
   [HttpDelete(DeleteProjectRequest.Route)]
   [SwaggerOperation(
-      Summary = "Deletes a Project",
-      Description = "Deletes a Project",
-      OperationId = "Projects.Delete",
-      Tags = new[] { "ProjectEndpoints" })
+    Summary = "Deletes a Project",
+    Description = "Deletes a Project",
+    OperationId = "Projects.Delete",
+    Tags = new[] {"ProjectEndpoints"})
   ]
   public override async Task<ActionResult> HandleAsync([FromRoute] DeleteProjectRequest request,
-      CancellationToken cancellationToken)
+    CancellationToken cancellationToken)
   {
     var aggregateToDelete = await _repository.GetByIdAsync(request.ProjectId); // TODO: pass cancellation token
-    if (aggregateToDelete == null) return NotFound();
+    if (aggregateToDelete == null)
+    {
+      return NotFound();
+    }
 
     await _repository.DeleteAsync(aggregateToDelete);
 

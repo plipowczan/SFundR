@@ -5,27 +5,23 @@ namespace SFundR.UnitTests.Core.ProjectAggregate;
 
 public class Project_AddItem
 {
-  private Project _testProject = new Project("some name");
+  private readonly Project _testProject = new("some name", "some description");
 
   [Fact]
   public void AddsItemToItems()
   {
-    var _testItem = new ToDoItem
-    {
-      Title = "title",
-      Description = "description"
-    };
+    var testItem = new TimeItem {Comment = "title", Date = DateTime.Now, WorkTimeHours = 2};
 
-    _testProject.AddItem(_testItem);
+    _testProject.AddItem(testItem);
 
-    Assert.Contains(_testItem, _testProject.Items);
+    Assert.Contains(testItem, _testProject.Items);
   }
 
   [Fact]
   public void ThrowsExceptionGivenNullItem()
   {
 #nullable disable
-    Action action = () => _testProject.AddItem(null);
+    var action = () => _testProject.AddItem(null);
 #nullable enable
 
     var ex = Assert.Throws<ArgumentNullException>(action);

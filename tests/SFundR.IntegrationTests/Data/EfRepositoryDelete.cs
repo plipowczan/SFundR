@@ -11,7 +11,8 @@ public class EfRepositoryDelete : BaseEfRepoTestFixture
     // add a project
     var repository = GetRepository();
     var initialName = Guid.NewGuid().ToString();
-    var project = new Project(initialName);
+    var initialDescription = Guid.NewGuid().ToString();
+    var project = new Project(initialName, initialDescription);
     await repository.AddAsync(project);
 
     // delete the item
@@ -19,6 +20,6 @@ public class EfRepositoryDelete : BaseEfRepoTestFixture
 
     // verify it's no longer there
     Assert.DoesNotContain(await repository.ListAsync(),
-        project => project.Name == initialName);
+      project => project.Name == initialName);
   }
 }

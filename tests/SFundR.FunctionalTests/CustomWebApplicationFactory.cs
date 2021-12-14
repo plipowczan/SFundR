@@ -1,22 +1,21 @@
-﻿using SFundR.Infrastructure.Data;
-using SFundR.UnitTests;
-using SFundR.Web;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SFundR.Infrastructure.Data;
+using SFundR.UnitTests;
+using SFundR.Web;
 
 namespace SFundR.FunctionalTests;
 
 public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
   /// <summary>
-  /// Overriding CreateHost to avoid creating a separate ServiceProvider per this thread:
-  /// https://github.com/dotnet-architecture/eShopOnWeb/issues/465
+  ///   Overriding CreateHost to avoid creating a separate ServiceProvider per this thread:
+  ///   https://github.com/dotnet-architecture/eShopOnWeb/issues/465
   /// </summary>
   /// <param name="builder"></param>
   /// <returns></returns>
@@ -36,7 +35,7 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
       var db = scopedServices.GetRequiredService<AppDbContext>();
 
       var logger = scopedServices
-          .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+        .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
 
       // Ensure the database is created.
       db.Database.EnsureCreated();
@@ -60,28 +59,28 @@ public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStar
   protected override void ConfigureWebHost(IWebHostBuilder builder)
   {
     builder
-        .ConfigureServices(services =>
+      .ConfigureServices(services =>
+      {
+        // Remove the app's ApplicationDbContext registration.
+        var descriptor = services.SingleOrDefault(
+          d => d.ServiceType ==
+               typeof(DbContextOptions<AppDbContext>));
+
+        if (descriptor != null)
         {
-              // Remove the app's ApplicationDbContext registration.
-              var descriptor = services.SingleOrDefault(
-              d => d.ServiceType ==
-                  typeof(DbContextOptions<AppDbContext>));
+          services.Remove(descriptor);
+        }
 
-          if (descriptor != null)
-          {
-            services.Remove(descriptor);
-          }
+        // This should be set for each individual test run
+        var inMemoryCollectionName = Guid.NewGuid().ToString();
 
-              // This should be set for each individual test run
-              string inMemoryCollectionName = Guid.NewGuid().ToString();
-
-              // Add ApplicationDbContext using an in-memory database for testing.
-              services.AddDbContext<AppDbContext>(options =>
-          {
+        // Add ApplicationDbContext using an in-memory database for testing.
+        services.AddDbContext<AppDbContext>(options =>
+        {
           options.UseInMemoryDatabase(inMemoryCollectionName);
         });
 
-          services.AddScoped<IMediator, NoOpMediator>();
-        });
+        services.AddScoped<IMediator, NoOpMediator>();
+      });
   }
 }

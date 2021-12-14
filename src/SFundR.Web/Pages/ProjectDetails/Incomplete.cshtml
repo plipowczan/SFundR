@@ -1,15 +1,15 @@
 ﻿@page
-@model SFundR.Web.Pages.ToDoRazorPage.IncompleteModel
+@model SFundR.Web.Pages.ProjectDetails.UnapprovedModel
 
-<h2>Incomplete To Do Items (Razor Page)</h2>
+<h2>Unapproved To Do Items (Razor Page)</h2>
 <ul>
-    @if (Model.ToDoItems != null)
+    @if (Model.TimeItems != null)
     {
-        @foreach (var item in Model.ToDoItems)
+        @foreach (var item in Model.TimeItems)
         {
             <li>
-                @item.Title
-                @if (item.IsDone)
+                @item.Comment
+                @if (item.IsApproved)
                 {
                     <span>DONE!</span>
                 }
@@ -17,7 +17,8 @@
                 {
                     <span>NOT DONE</span>
                 }
-                <br/>@item.Description
+                <br/>@item.Date
+                <br/>@item.WorkTimeHours
             </li>
         }
     }

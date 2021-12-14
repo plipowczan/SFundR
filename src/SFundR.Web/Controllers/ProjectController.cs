@@ -1,8 +1,8 @@
-﻿using SFundR.Core.ProjectAggregate;
+﻿using Microsoft.AspNetCore.Mvc;
+using SFundR.Core.ProjectAggregate;
 using SFundR.Core.ProjectAggregate.Specifications;
 using SFundR.SharedKernel.Interfaces;
 using SFundR.Web.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 
 namespace SFundR.Web.Controllers;
 
@@ -32,8 +32,8 @@ public class ProjectController : Controller
       Id = project.Id,
       Name = project.Name,
       Items = project.Items
-                    .Select(item => ToDoItemViewModel.FromToDoItem(item))
-                    .ToList()
+        .Select(item => TimeItemViewModel.FromTimeItem(item))
+        .ToList()
     };
     return View(dto);
   }

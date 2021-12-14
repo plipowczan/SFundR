@@ -7,18 +7,20 @@ namespace SFundR.Core.ProjectAggregate;
 
 public class Project : BaseEntity, IAggregateRoot
 {
-  public string Name { get; private set; }
+  private readonly List<TimeItem> _items = new();
 
-  private List<ToDoItem> _items = new List<ToDoItem>();
-  public IEnumerable<ToDoItem> Items => _items.AsReadOnly();
-  public ProjectStatus Status => _items.All(i => i.IsDone) ? ProjectStatus.Complete : ProjectStatus.InProgress;
-
-  public Project(string name)
+  public Project(string name, string description)
   {
+    Description = description;
     Name = Guard.Against.NullOrEmpty(name, nameof(name));
   }
 
-  public void AddItem(ToDoItem newItem)
+  public string Name { get; private set; }
+
+  public string Description { get; private set; }
+  public IEnumerable<TimeItem> Items => _items.AsReadOnly();
+
+  public void AddItem(TimeItem newItem)
   {
     Guard.Against.Null(newItem, nameof(newItem));
     _items.Add(newItem);
@@ -27,8 +29,9 @@ public class Project : BaseEntity, IAggregateRoot
     Events.Add(newItemAddedEvent);
   }
 
-  public void UpdateName(string newName)
+  public void Update(string newName, string newDescription)
   {
     Name = Guard.Against.NullOrEmpty(newName, nameof(newName));
+    Description = newDescription;
   }
 }

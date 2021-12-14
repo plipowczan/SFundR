@@ -1,14 +1,15 @@
-﻿using SFundR.Core.ProjectAggregate;
+﻿using Microsoft.AspNetCore.Mvc;
+using SFundR.Core.ProjectAggregate;
 using SFundR.Core.ProjectAggregate.Specifications;
 using SFundR.SharedKernel.Interfaces;
 using SFundR.Web.ApiModels;
-using Microsoft.AspNetCore.Mvc;
 
 namespace SFundR.Web.Api;
 
 /// <summary>
-/// A sample API Controller. Consider using API Endpoints (see Endpoints folder) for a more SOLID approach to building APIs
-/// https://github.com/ardalis/ApiEndpoints
+///   A sample API Controller. Consider using API Endpoints (see Endpoints folder) for a more SOLID approach to building
+///   APIs
+///   https://github.com/ardalis/ApiEndpoints
 /// </summary>
 public class ProjectsController : BaseApiController
 {
@@ -24,12 +25,13 @@ public class ProjectsController : BaseApiController
   public async Task<IActionResult> List()
   {
     var projectDTOs = (await _repository.ListAsync())
-        .Select(project => new ProjectDTO
-        (
-            id: project.Id,
-            name: project.Name
-        ))
-        .ToList();
+      .Select(project => new ProjectDTO
+      (
+        project.Id,
+        project.Name,
+        project.Description
+      ))
+      .ToList();
 
     return Ok(projectDTOs);
   }
@@ -47,12 +49,13 @@ public class ProjectsController : BaseApiController
 
     var result = new ProjectDTO
     (
-        id: project.Id,
-        name: project.Name,
-        items: new List<ToDoItemDTO>
-        (
-            project.Items.Select(i => ToDoItemDTO.FromToDoItem(i)).ToList()
-        )
+      project.Id,
+      project.Name,
+      project.Description,
+      new List<TimeItemDTO>
+      (
+        project.Items.Select(TimeItemDTO.FromTimeItem).ToList()
+      )
     );
 
     return Ok(result);
@@ -62,30 +65,37 @@ public class ProjectsController : BaseApiController
   [HttpPost]
   public async Task<IActionResult> Post([FromBody] CreateProjectDTO request)
   {
-    var newProject = new Project(request.Name);
+    var newProject = new Project(request.Name, request.Description);
 
     var createdProject = await _repository.AddAsync(newProject);
 
     var result = new ProjectDTO
     (
-        id: createdProject.Id,
-        name: createdProject.Name
+      createdProject.Id,
+      createdProject.Name,
+      createdProject.Description
     );
     return Ok(result);
   }
 
-  // PATCH: api/Projects/{projectId}/complete/{itemId}
-  [HttpPatch("{projectId:int}/complete/{itemId}")]
-  public async Task<IActionResult> Complete(int projectId, int itemId)
+  // PATCH: api/Projects/{projectId}/approve/{itemId}
+  [HttpPatch("{projectId:int}/approve/{itemId}")]
+  public async Task<IActionResult> Approve(int projectId, int itemId)
   {
     var projectSpec = new ProjectByIdWithItemsSpec(projectId);
     var project = await _repository.GetBySpecAsync(projectSpec);
-    if (project == null) return NotFound("No such project");
+    if (project == null)
+    {
+      return NotFound("No such project");
+    }
 
-    var toDoItem = project.Items.FirstOrDefault(item => item.Id == itemId);
-    if (toDoItem == null) return NotFound("No such item.");
+    var timeItem = project.Items.FirstOrDefault(item => item.Id == itemId);
+    if (timeItem == null)
+    {
+      return NotFound("No such item.");
+    }
 
-    toDoItem.MarkComplete();
+    timeItem.Approve();
     await _repository.UpdateAsync(project);
 
     return Ok();

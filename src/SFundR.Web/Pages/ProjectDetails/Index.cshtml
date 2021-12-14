@@ -1,18 +1,17 @@
 ﻿@page "{ProjectId}"
-@model SFundR.Web.Pages.ToDoRazorPage.IndexModel
+@model SFundR.Web.Pages.ProjectDetails.IndexModel
 
-@if (!String.IsNullOrEmpty(Model.Message))
+@if (!string.IsNullOrEmpty(Model.Message))
 {
     <h2>@Model.Message</h2>
 }
 else
 {
+    <h2>Project (Razor Page)</h2>
 
-<h2>Project (Razor Page)</h2>
+    <h3>Name: @Model.Project?.Name</h3>
 
-<h3>Name: @Model.Project?.Name</h3>
-
-<b>Items:</b>
+    <b>Items:</b>
 
     <ul>
         @if (Model.Project != null)
@@ -20,8 +19,8 @@ else
             @foreach (var item in Model.Project.Items)
             {
                 <li>
-                    @item.Title
-                    @if (item.IsDone)
+                    @item.Comment
+                    @if (item.IsApproved)
                     {
                         <span>DONE!</span>
                     }
@@ -29,7 +28,7 @@ else
                     {
                         <span>NOT DONE</span>
                     }
-                    <br/>@item.Description
+                    <br/>@item.Date
                 </li>
             }
         }

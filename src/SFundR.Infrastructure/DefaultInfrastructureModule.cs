@@ -1,33 +1,36 @@
 ﻿using System.Reflection;
 using Autofac;
+using MediatR;
+using MediatR.Pipeline;
 using SFundR.Core.Interfaces;
 using SFundR.Core.ProjectAggregate;
 using SFundR.Infrastructure.Data;
 using SFundR.SharedKernel.Interfaces;
-using MediatR;
-using MediatR.Pipeline;
 using Module = Autofac.Module;
 
 namespace SFundR.Infrastructure;
 
 public class DefaultInfrastructureModule : Module
 {
-  private readonly bool _isDevelopment = false;
-  private readonly List<Assembly> _assemblies = new List<Assembly>();
+  private readonly List<Assembly> _assemblies = new();
+  private readonly bool _isDevelopment;
 
   public DefaultInfrastructureModule(bool isDevelopment, Assembly? callingAssembly = null)
   {
     _isDevelopment = isDevelopment;
-    var coreAssembly = Assembly.GetAssembly(typeof(Project)); // TODO: Replace "Project" with any type from your Core project
+    var coreAssembly =
+      Assembly.GetAssembly(typeof(Project)); // TODO: Replace "Project" with any type from your Core project
     var infrastructureAssembly = Assembly.GetAssembly(typeof(StartupSetup));
     if (coreAssembly != null)
     {
       _assemblies.Add(coreAssembly);
     }
+
     if (infrastructureAssembly != null)
     {
       _assemblies.Add(infrastructureAssembly);
     }
+
     if (callingAssembly != null)
     {
       _assemblies.Add(callingAssembly);
@@ -44,20 +47,21 @@ public class DefaultInfrastructureModule : Module
     {
       RegisterProductionOnlyDependencies(builder);
     }
+
     RegisterCommonDependencies(builder);
   }
 
   private void RegisterCommonDependencies(ContainerBuilder builder)
   {
     builder.RegisterGeneric(typeof(EfRepository<>))
-        .As(typeof(IRepository<>))
-        .As(typeof(IReadRepository<>))
-        .InstancePerLifetimeScope();
+      .As(typeof(IRepository<>))
+      .As(typeof(IReadRepository<>))
+      .InstancePerLifetimeScope();
 
     builder
-        .RegisterType<Mediator>()
-        .As<IMediator>()
-        .InstancePerLifetimeScope();
+      .RegisterType<Mediator>()
+      .As<IMediator>()
+      .InstancePerLifetimeScope();
 
     builder.Register<ServiceFactory>(context =>
     {
@@ -65,24 +69,22 @@ public class DefaultInfrastructureModule : Module
       return t => c.Resolve(t);
     });
 
-    var mediatrOpenTypes = new[]
+    var mediatorOpenTypes = new[]
     {
-                typeof(IRequestHandler<,>),
-                typeof(IRequestExceptionHandler<,,>),
-                typeof(IRequestExceptionAction<,>),
-                typeof(INotificationHandler<>),
-            };
+      typeof(IRequestHandler<,>), typeof(IRequestExceptionHandler<,,>), typeof(IRequestExceptionAction<,>),
+      typeof(INotificationHandler<>)
+    };
 
-    foreach (var mediatrOpenType in mediatrOpenTypes)
+    foreach (var mediatorOpenType in mediatorOpenTypes)
     {
       builder
-      .RegisterAssemblyTypes(_assemblies.ToArray())
-      .AsClosedTypesOf(mediatrOpenType)
-      .AsImplementedInterfaces();
+        .RegisterAssemblyTypes(_assemblies.ToArray())
+        .AsClosedTypesOf(mediatorOpenType)
+        .AsImplementedInterfaces();
     }
 
     builder.RegisterType<EmailSender>().As<IEmailSender>()
-        .InstancePerLifetimeScope();
+      .InstancePerLifetimeScope();
   }
 
   private void RegisterDevelopmentOnlyDependencies(ContainerBuilder builder)
@@ -94,5 +96,4 @@ public class DefaultInfrastructureModule : Module
   {
     // TODO: Add production only services
   }
-
 }

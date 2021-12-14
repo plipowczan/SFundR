@@ -4,22 +4,22 @@ using Xunit;
 
 namespace SFundR.UnitTests.Core.Specifications;
 
-public class IncompleteItemsSpecificationConstructor
+public class UnapprovedItemsSpecificationConstructor
 {
   [Fact]
-  public void FilterCollectionToOnlyReturnItemsWithIsDoneFalse()
+  public void FilterCollectionToOnlyReturnItemsWithIsApprovedFalse()
   {
-    var item1 = new ToDoItem();
-    var item2 = new ToDoItem();
-    var item3 = new ToDoItem();
-    item3.MarkComplete();
+    var item1 = new TimeItem();
+    var item2 = new TimeItem();
+    var item3 = new TimeItem();
+    item3.Approve();
 
-    var items = new List<ToDoItem>() { item1, item2, item3 };
+    var items = new List<TimeItem> {item1, item2, item3};
 
-    var spec = new IncompleteItemsSpec();
-    List<ToDoItem> filteredList = items
-        .Where(spec.WhereExpressions.First().Compile())
-        .ToList();
+    var spec = new UnapprovedItemsSpec();
+    var filteredList = items
+      .Where(spec.WhereExpressions.First().Compile())
+      .ToList();
 
     Assert.Contains(item1, filteredList);
     Assert.Contains(item2, filteredList);

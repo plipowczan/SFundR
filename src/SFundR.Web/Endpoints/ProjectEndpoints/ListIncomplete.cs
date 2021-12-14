@@ -1,52 +1,53 @@
 ﻿using Ardalis.ApiEndpoints;
-using SFundR.Core.Interfaces;
+using Ardalis.Result;
 using Microsoft.AspNetCore.Mvc;
+using SFundR.Core.Interfaces;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace SFundR.Web.Endpoints.ProjectEndpoints;
 
-public class ListIncomplete : BaseAsyncEndpoint
-    .WithRequest<ListIncompleteRequest>
-    .WithResponse<ListIncompleteResponse>
+public class ListIncomplete : BaseAsyncEndpoint.WithRequest<ListIncompleteRequest>.WithResponse<ListIncompleteResponse>
 {
-  private readonly IToDoItemSearchService _searchService;
+  private readonly ITimeItemSearchService _searchService;
 
-  public ListIncomplete(IToDoItemSearchService searchService)
+  public ListIncomplete(ITimeItemSearchService searchService)
   {
     _searchService = searchService;
   }
 
   [HttpGet("/Projects/{ProjectId}/IncompleteItems")]
   [SwaggerOperation(
-      Summary = "Gets a list of a project's incomplete items",
-      Description = "Gets a list of a project's incomplete items",
-      OperationId = "Project.ListIncomplete",
-      Tags = new[] { "ProjectEndpoints" })
+    Summary = "Gets a list of a project's incomplete items",
+    Description = "Gets a list of a project's incomplete items",
+    OperationId = "Project.ListIncomplete",
+    Tags = new[] {"ProjectEndpoints"})
   ]
-  public override async Task<ActionResult<ListIncompleteResponse>> HandleAsync([FromQuery] ListIncompleteRequest request, CancellationToken cancellationToken)
+  public override async Task<ActionResult<ListIncompleteResponse>> HandleAsync(
+    [FromQuery] ListIncompleteRequest request, CancellationToken cancellationToken)
   {
     if (request.SearchString == null)
     {
       return BadRequest();
     }
-    var response = new ListIncompleteResponse(0, new List<ToDoItemRecord>());
-    var result = await _searchService.GetAllIncompleteItemsAsync(request.ProjectId, request.SearchString);
 
-    if (result.Status == Ardalis.Result.ResultStatus.Ok)
+    var response = new ListIncompleteResponse(0, new List<TimeItemRecord>());
+    var result = await _searchService.GetAllUnapprovedItemsAsync(request.ProjectId, request.SearchString);
+
+    if (result.Status == ResultStatus.Ok)
     {
       response.ProjectId = request.ProjectId;
-      response.IncompleteItems = new List<ToDoItemRecord>(
-              result.Value.Select(
-                  item => new ToDoItemRecord(item.Id,
-                  item.Title,
-                  item.Description,
-                  item.IsDone)));
+      response.IncompleteItems = new List<TimeItemRecord>(
+        result.Value.Select(
+          item => new TimeItemRecord(item.Id,
+            item.Comment,
+            item.Date,
+            item.IsApproved, item.ApprovedDateTime)));
     }
-    else if (result.Status == Ardalis.Result.ResultStatus.Invalid)
+    else if (result.Status == ResultStatus.Invalid)
     {
       return BadRequest(result.ValidationErrors);
     }
-    else if (result.Status == Ardalis.Result.ResultStatus.NotFound)
+    else if (result.Status == ResultStatus.NotFound)
     {
       return NotFound();
     }

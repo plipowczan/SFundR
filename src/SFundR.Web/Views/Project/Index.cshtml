@@ -13,7 +13,9 @@
     {
         @foreach (var item in Model.Items)
         {
-            <li>@item.Title<br/>@item.Description</li>
+            <li>
+                @item.Comment<br/>@item.Date<br/>@item.WorkTimeHours
+            </li>
         }
     }
 </ul>

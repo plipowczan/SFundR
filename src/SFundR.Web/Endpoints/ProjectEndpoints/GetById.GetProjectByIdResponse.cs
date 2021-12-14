@@ -1,9 +1,8 @@
-﻿
-namespace SFundR.Web.Endpoints.ProjectEndpoints;
+﻿namespace SFundR.Web.Endpoints.ProjectEndpoints;
 
 public class GetProjectByIdResponse
 {
-  public GetProjectByIdResponse(int id, string name, List<ToDoItemRecord> items)
+  public GetProjectByIdResponse(int id, string name, List<TimeItemRecord> items)
   {
     Id = id;
     Name = name;
@@ -12,5 +11,5 @@ public class GetProjectByIdResponse
 
   public int Id { get; set; }
   public string Name { get; set; }
-  public List<ToDoItemRecord> Items { get; set; } = new();
+  public List<TimeItemRecord> Items { get; set; } = new();
 }

@@ -1,16 +1,16 @@
-﻿using SFundR.Core.Interfaces;
+﻿using Moq;
+using SFundR.Core.Interfaces;
 using SFundR.Core.ProjectAggregate;
 using SFundR.Core.ProjectAggregate.Events;
 using SFundR.Core.ProjectAggregate.Handlers;
-using Moq;
 using Xunit;
 
 namespace SFundR.UnitTests.Core.Handlers;
 
 public class ItemCompletedEmailNotificationHandlerHandle
 {
-  private ItemCompletedEmailNotificationHandler _handler;
-  private Mock<IEmailSender> _emailSenderMock;
+  private readonly Mock<IEmailSender> _emailSenderMock;
+  private readonly ItemCompletedEmailNotificationHandler _handler;
 
   public ItemCompletedEmailNotificationHandlerHandle()
   {
@@ -29,8 +29,10 @@ public class ItemCompletedEmailNotificationHandlerHandle
   [Fact]
   public async Task SendsEmailGivenEventInstance()
   {
-    await _handler.Handle(new ToDoItemCompletedEvent(new ToDoItem()), CancellationToken.None);
+    await _handler.Handle(new TimeItemApprovedEvent(new TimeItem()), CancellationToken.None);
 
-    _emailSenderMock.Verify(sender => sender.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    _emailSenderMock.Verify(
+      sender => sender.SendEmailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+      Times.Once);
   }
 }
