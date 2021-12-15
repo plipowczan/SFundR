@@ -5,12 +5,12 @@ using SFundR.Core.ProjectAggregate.Events;
 
 namespace SFundR.Core.ProjectAggregate.Handlers;
 
-public class ItemCompletedEmailNotificationHandler : INotificationHandler<TimeItemApprovedEvent>
+public class ItemApprovedEmailNotificationHandler : INotificationHandler<TimeItemApprovedEvent>
 {
   private readonly IEmailSender _emailSender;
 
   // In a REAL app you might want to use the Outbox pattern and a command/queue here...
-  public ItemCompletedEmailNotificationHandler(IEmailSender emailSender)
+  public ItemApprovedEmailNotificationHandler(IEmailSender emailSender)
   {
     _emailSender = emailSender;
   }

@@ -10,12 +10,12 @@ namespace SFundR.UnitTests.Core.Handlers;
 public class ItemCompletedEmailNotificationHandlerHandle
 {
   private readonly Mock<IEmailSender> _emailSenderMock;
-  private readonly ItemCompletedEmailNotificationHandler _handler;
+  private readonly ItemApprovedEmailNotificationHandler _handler;
 
   public ItemCompletedEmailNotificationHandlerHandle()
   {
     _emailSenderMock = new Mock<IEmailSender>();
-    _handler = new ItemCompletedEmailNotificationHandler(_emailSenderMock.Object);
+    _handler = new ItemApprovedEmailNotificationHandler(_emailSenderMock.Object);
   }
 
   [Fact]
