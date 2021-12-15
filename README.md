@@ -13,7 +13,7 @@
 
 # Goals
 
-The goal of this repository is to provide a solution for the ShareFund Project. You can read more about the project [here](https://www.sfundr.com).
+The goal of this repository is to provide a solution for the ShareFund Project. It is about creating a tool which will help bootstraped startaps with straightforward and fair project ownership sharing. You can read more about the project [here](https://www.sfundr.com).
 
 # Design Decisions and Dependencies
 
